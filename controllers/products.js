@@ -1,37 +1,14 @@
 const Product = require('../models/Product');
 
 const getAllProducts = async (req, res) => {
-  const { brand, category, title, sort, sd } = req.query;
-  const queryObject = {};
-  if (brand) {
-    queryObject.brand = brand;
-  }
-  if (category) {
-    queryObject.category = category;
-  }
-  if (title) {
-    queryObject.title = { $regex: title, $options: 'i'};
-  }
-  
-  let nP = 0
-  let result = Product.find(queryObject);
-  let sortList = '';
-  
-  if (sort || sd) {
-    sortList = `${sort} ${sd}`;
-  }
-
-  result = await result.sort(sortList);
-  nP = result.length;
+  const result = await Product.find();
+  const nP = result.length;
   
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 12;
   const skip = (page - 1) * limit;
 
   const products = result.slice((skip), (limit * page));
-  if (!(category || title) ) {
-    nP = await Product.count();
-  }
   const nPages = Math.ceil(nP / limit);
 
   res.status(200).render('allProducts', { products, nPages });
@@ -94,7 +71,7 @@ const updateProductById = async (req, res) => {
   res.status(200).redirect(`/products/${id}`);
 };
 
-const deleteProductById = async (req, res, next) => {
+const deleteProductById = async (req, res) => {
   const { id } = req.params;
   const product = await Product.findOneAndDelete({ id });
 

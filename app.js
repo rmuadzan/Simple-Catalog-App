@@ -9,7 +9,10 @@ const methodOverride = require('method-override');
 
 const notFound = require('./middlewares/not-found');
 const errorHandlerMiddleware = require('./middlewares/error-handler');
+const indexRouter = require('./routes/indexRoute');
 const productsRouter = require('./routes/products');
+const searchRouter = require('./routes/searchRoute');
+const aboutRouter = require('./routes/aboutRoute');
 
 
 const app = new Express();
@@ -19,13 +22,11 @@ app.use(Express.json());
 app.use(Express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 
-app.get('/', (req, res) => {
-  res.status(200).render('index');
-})
-app.get('/about', (req, res) => {
-  res.status(200).render('about');
-})
+app.use('/', indexRouter);
+app.use('/about', aboutRouter);
+app.use('/search', searchRouter);
 app.use('/products', productsRouter);
+
 app.use(notFound);
 app.use(errorHandlerMiddleware);
 
